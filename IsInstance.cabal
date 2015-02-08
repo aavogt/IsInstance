@@ -1,0 +1,23 @@
+name:                IsInstance
+version:             0.0
+synopsis:            check whether a type is an instance of a class
+description:         check whether a type is an instance of a class
+                     by generating instances of a class @IsInstance@
+homepage:            github.com/aavogt/IsInstance
+license:             BSD3
+license-file:        LICENSE
+author:              Adam Vogt <vogt.adam@gmail.com>
+maintainer:          Adam Vogt <vogt.adam@gmail.com>
+-- copyright:           
+category:            Development
+build-type:          Simple
+-- extra-source-files:  
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     IsInstance
+  -- other-modules:       
+  other-extensions:    RankNTypes, OverlappingInstances, FlexibleInstances, MultiParamTypeClasses, ConstraintKinds, KindSignatures, TemplateHaskell
+  build-depends:       base >=4.7 && <4.8, template-haskell >=2.9 && <2.10
+  hs-source-dirs:      src
+  default-language:    Haskell2010
