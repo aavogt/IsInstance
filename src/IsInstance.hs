@@ -14,6 +14,10 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE CPP #-}
+#if __GLASGOW_HASKELL__ >= 711
+{-# LANGUAGE UndecidableSuperClasses #-}
+#endif
 module IsInstance
   (ifHasInstance,
    whenHasInstance,
@@ -26,12 +30,10 @@ module IsInstance
    AndCxt,
   ) where
 
-import qualified IPPrint
 import Data.IORef
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad.State
 import Language.Haskell.TH
-import Language.Haskell.TH.Syntax(putQ,getQ, addTopDecls)
 import GHC.Exts (Constraint)
 import Control.Applicative
 import Data.Proxy
@@ -45,8 +47,6 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 
 import Data.Generics
-
-import Debug.Trace
 
 -- import Data.Constraint (Dict(Dict))
 data Dict c where
