@@ -62,6 +62,16 @@ class TryCxt (c :: Constraint) (b :: Bool) | c -> b
 -- | overlapping case: there is no instance
 instance (False ~ false) => TryCxt c false
 
+-- Should technically satisfy the liberal coverage condition, but ghc
+-- doesn't see that either c is emitted, which can help to refine type
+-- variables, or b is False in which case the TryCxt should be able to
+-- jump to the conclusion that no instance
+type TryCxtEmit (c :: Constraint) (b :: Bool) = (TryCxt c b, EmitCxtWhen b c)
+
+type family EmitCxtWhen b (c :: Constraint) :: Constraint where
+  EmitCxtWhen True c = c
+  EmitCxtWhen False c = ()
+
 -- | @AndCxt :: (* -> Constraint) -> (* -> Constraint) -> (* -> Constraint)@
 class (f x, g x) => AndCxt f g x
 
@@ -196,7 +206,7 @@ writeTryCxt1 className = StateT $ \s -> do
 
               tentativeCxt = sequence $
                    [t| $(andCxts (map varT qs)) ~ $(varT r) |] :
-                   [ [t| TryCxt $(return c) $(varT q) |]
+                   [ [t| TryCxtEmit $(return c) $(varT q) |]
                                 | (q, c) <- zip qs cxt ]
           instanceD tentativeCxt [t| TryCxt $(return hd) $(varT r) |]
               []
