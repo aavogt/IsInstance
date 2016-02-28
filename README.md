@@ -50,27 +50,15 @@ instance Show x where show _ = "<NO SHOW>"
 # TODO
 
 * an ExpQ splice for `ifHasInstance` that adds the necessary writeTryCxt declarations
-* instance bodies may reference other classes in a way that writeTryCxt doesn't
-  see, so `TryCxt` may be missing. For example:
+* individual constraints in the instance body can depend on each other but they are
+  currently tested independently. For example `tests/fail1.hs` has `instance (c Int, c ~ Num) => D Int` which leads to the generated TryCxt instance has an instance body including a `(TryCxt (c Int) b1, TryCxt (c ~ Num) b2)` which does not satisfy the functional dependencies on TryCxt. What should really happen are reduction steps like:
 
 ```haskell
-instance c Int => D c
-instance (c Int, c ~ Num) => D Int
+  (TryCxt (c Int) b1, TryCxt (c ~ Num) b2)
+  (TryCxt (c Int) b1, TryCxt (c ~ Num) True)
+  (TryCxt (c Int) b1, c ~ Num)
+  (TryCxt (Num Int) b1) -- can then find b1 ~ True
 ```
 
-```haskell
-class C1 x r s | x r -> s
+currently this problem results in the `instance TryCxt (D Int) b` being rejected.
 
-class C (xs :: [Symbol]) (r :: *) (v :: *) | xs r -> v
-
-instance (C1 x r s, C xs s v) => C (x ': xs) r v
-
-
--- generated code is rejected because the
--- "x r -> s" FD should be in the instance body
--- if C needs to be tested
-instance (And q1 (And q2 True) ~ q,
-          TryCxt (C1 x r s) q1,
-          TryCxt (C xs s v) q2) =>
-         TryCxt (C (x ': xs) r v) q
-```
