@@ -14,5 +14,5 @@ writeTryCxt ''Show
 
 f x = ifHasInstance (Proxy :: Proxy Show) "NO SHOW" show x
 main = do
-    putStrLn (f (+1))
-    putStrLn (f ())
+    putStrLn (f ((+1), "y"))
+    putStrLn (f ('x', "y"))

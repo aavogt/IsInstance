@@ -46,8 +46,10 @@ main = hspec $ do
   it "f1" $ do
     f1 (1 :: Int) `shouldBe` "NA"
     f1 (1 :: Double) `shouldBe` "0.5"
+    f1 ((),'x') `shouldBe` "NA"
 
   it "f2" $ do
     f2 (1 :: Int) `shouldBe` "Left 1"
     f2 (1 :: Double) `shouldBe` "Right 0.5"
     f2 ('1' : ) `shouldBe` "Left NA"
+    f2 ('x','y') `shouldBe` "Left ('x','y')"
